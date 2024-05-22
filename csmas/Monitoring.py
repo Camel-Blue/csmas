@@ -1,12 +1,9 @@
 import sys
-
 import psutil
 import platform
 from datetime import datetime, timezone
 import cpuinfo
-import disnake
 import yaml
-from disnake.ext import commands, tasks
 import asyncio
 import requests
 
@@ -102,39 +99,39 @@ Total Bytes Received: {get_size(net_io.bytes_recv)}
 	}
 	return embed_json
 
-
-try:
-	with open(f'webhooks.yaml') as file2:
-		yaml_dict = yaml.full_load(file2)
-		webhooks = yaml_dict['webhooks']
-		cycle = yaml_dict['Update_cycle']
-		if type(webhooks) is not list:
-			print('No webhooks found')
-			sys.exit(0)
-		for i in webhooks:
-			if 'messages' not in i:
-				data = {
-					"embeds": [{
-			'color': 65311,
-			'type': 'rich',
-			'description': 'temp',
-			'title': 'Server info'}]
-				}
-				r = requests.post(url=i, json=data)
-				print(r)
-		print('Webhooks posted, please make them message specific')
-except Exception as e:
-	print(e)
-	webhooks = []
-	cycle = 10
-	with open('webhooks.yaml', 'w') as file:
-		file.write('# The update cycle is in seconds\n')
-		file.write('Update_cycle: 10\n')
-		file.write('# Webhook list will be checked every 10 cycles\n')
-		file.write('# To add a webhook use "- https://discord.com/api/webhooks/<token>/messages/<message id>\n')
-		file.write('webhooks: \n - null\n')
-	print('No webhook file found, new one generated')
-	sys.exit(0)
+def test_wh_file():
+	try:
+		with open(f'../webhooks.yaml') as file2:
+			yaml_dict = yaml.full_load(file2)
+			webhooks = yaml_dict['webhooks']
+			cycle = yaml_dict['Update_cycle']
+			if type(webhooks) is not list:
+				print('No webhooks found')
+				sys.exit(0)
+			for i in webhooks:
+				if 'messages' not in i:
+					data = {
+						"embeds": [{
+				'color': 65311,
+				'type': 'rich',
+				'description': 'temp',
+				'title': 'Server info'}]
+					}
+					r = requests.post(url=i, json=data)
+					print(r)
+			print('Webhooks posted, please make them message specific')
+	except Exception as e:
+		print(e)
+		webhooks = []
+		cycle = 10
+		with open('../webhooks.yaml', 'w') as file:
+			file.write('# The update cycle is in seconds\n')
+			file.write('Update_cycle: 10\n')
+			file.write('# Webhook list will be checked every 10 cycles\n')
+			file.write('# To add a webhook use "- https://discord.com/api/webhooks/<token>/messages/<message id>\n')
+			file.write('webhooks: \n - null\n')
+		print('No webhook file found, new one generated')
+		sys.exit(0)
 
 curr_cycle = 0
 async def csmas_handler():
@@ -159,6 +156,7 @@ async def csmas_handler():
 			except Exception as e:
 				print(e)
 		await asyncio.sleep(cycle)
-
-asyncio.run(csmas_handler())
+def run():
+	test_wh_file()
+	asyncio.run(csmas_handler())
 
